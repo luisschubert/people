@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AWSCore
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        AWSLogger.default().logLevel = .verbose
+        let fileLogger: AWSDDFileLogger = AWSDDFileLogger() // File Logger
+        fileLogger.rollingFrequency = TimeInterval(60*60*24)  // 24 hours
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 7
+        AWSDDLog.add(fileLogger)
+        AWSDDLog.add(AWSDDTTYLogger.sharedInstance)
+        let myIdentityPoolId = "us-west-2:7207e044-ecfc-4fda-9d77-c6d253706d37"
+        let credentialsProvider = AWSCognitoCredentialsProvider(
+            regionType: AWSRegionType.USWest2,
+            identityPoolId: myIdentityPoolId)
+        let configuration = AWSServiceConfiguration(
+            region: AWSRegionType.USWest1,
+            credentialsProvider: credentialsProvider)
+        AWSServiceManager.default().defaultServiceConfiguration = configuration
         return true
     }
 
