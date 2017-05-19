@@ -17,6 +17,7 @@
 		A85F23F71EBB189B003AD64A /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85F23F61EBB189B003AD64A /* MapViewController.swift */; };
 		A85F23F91EBBA1E5003AD64A /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85F23F81EBBA1E5003AD64A /* HomeViewController.swift */; };
 		A85F23FB1EBBA71E003AD64A /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85F23FA1EBBA71E003AD64A /* SignUpViewController.swift */; };
+		A8A942351ECE2F0A00603608 /* DropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A942341ECE2F0A00603608 /* DropViewController.swift */; };
 		A8B989621EBC3849002A9F80 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B989611EBC3849002A9F80 /* LoginViewController.swift */; };
 		A8B989681EC1344B002A9F80 /* SpeakViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B989671EC1344B002A9F80 /* SpeakViewController.swift */; };
 		A8B989721EC1912B002A9F80 /* SpeakRecordingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B989711EC1912B002A9F80 /* SpeakRecordingViewController.swift */; };
@@ -38,6 +39,7 @@
 		A85F23F61EBB189B003AD64A /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MapViewController.swift; path = iOSWorld/MapViewController.swift; sourceTree = SOURCE_ROOT; };
 		A85F23F81EBBA1E5003AD64A /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		A85F23FA1EBBA71E003AD64A /* SignUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
+		A8A942341ECE2F0A00603608 /* DropViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DropViewController.swift; sourceTree = "<group>"; };
 		A8B989611EBC3849002A9F80 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		A8B989671EC1344B002A9F80 /* SpeakViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpeakViewController.swift; sourceTree = "<group>"; };
 		A8B989711EC1912B002A9F80 /* SpeakRecordingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpeakRecordingViewController.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				A8B989711EC1912B002A9F80 /* SpeakRecordingViewController.swift */,
 				A8C53BF01EC97727002FCA9D /* LawViewController.swift */,
 				A8C53BF21EC97D96002FCA9D /* ValuesViewController.swift */,
+				A8A942341ECE2F0A00603608 /* DropViewController.swift */,
 			);
 			path = iOSWorld;
 			sourceTree = "<group>";
@@ -258,6 +261,7 @@
 				A8C53BF31EC97D96002FCA9D /* ValuesViewController.swift in Sources */,
 				A8B989721EC1912B002A9F80 /* SpeakRecordingViewController.swift in Sources */,
 				A85F23FB1EBBA71E003AD64A /* SignUpViewController.swift in Sources */,
+				A8A942351ECE2F0A00603608 /* DropViewController.swift in Sources */,
 				A8B989621EBC3849002A9F80 /* LoginViewController.swift in Sources */,
 				A8C53BF11EC97727002FCA9D /* LawViewController.swift in Sources */,
 				A85F23F91EBBA1E5003AD64A /* HomeViewController.swift in Sources */,

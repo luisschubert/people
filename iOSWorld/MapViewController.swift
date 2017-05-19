@@ -11,6 +11,16 @@ import MapKit
 import AWSCore
 import AWSS3
 
+extension UIImage{
+    func resized(withPercentage percentage: CGFloat) -> UIImage? {
+        let canvasSize = CGSize(width: size.width * percentage, height: size.height * percentage)
+        UIGraphicsBeginImageContextWithOptions(canvasSize, false, scale)
+        defer { UIGraphicsEndImageContext() }
+        draw(in: CGRect(origin: .zero, size: canvasSize))
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
+}
+
 class MyPointAnnotation : MKPointAnnotation {
     var pinTintColor: UIColor?
 }
@@ -76,8 +86,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
             if let imagePinAnnotation = view.annotation{
                 if let imageName = imagePinAnnotation.title as? String{
                     if imageName != "USER"{
-                        let imageAddress = "https://s3-us-west-1.amazonaws.com/worlddata/\(String(describing: imageName)).png"
-                        UIApplication.shared.open(NSURL(string: imageAddress)! as URL)
+                        let dropViewController = storyBoard.instantiateViewController(withIdentifier: "DropViewController") as! DropViewController
+                        dropViewController.imageName = imageName
+                        self.present(dropViewController,animated: true, completion: nil)
+//                        let imageAddress = "https://s3-us-west-1.amazonaws.com/worlddata/\(String(describing: imageName)).png"
+//                        UIApplication.shared.open(NSURL(string: imageAddress)! as URL)
                     }
                         
                     
@@ -90,6 +103,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
     }
     
     //SPEAK FUNCTIONALITY
+    @IBAction func touchDownOnSpeak(_ sender: Any) {
+        DispatchQueue.main.async{
+            self.speakButton.alpha = 1
+        }
+    }
     @IBOutlet weak var speakButton: UIButton!
     @IBAction func showSpeak(_ sender: UIButton) {
         speakButton.alpha = 0.7
@@ -157,11 +175,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
     }
     
     
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
         //AWSDDLog.setLevel(.verbose, for: .)
         let chosenImage = info[UIImagePickerControllerEditedImage] as! UIImage
         
+        UIImageWriteToSavedPhotosAlbum(chosenImage, nil, nil, nil)
         //let fileURL = documentsUrl.appendingPathComponent(fileName)
 //        if let imageData = UIImageJPEGRepresentation(chosenImage, 1.0) {
 //            try? imageData.write(to: fileURL, options: .atomic)
@@ -217,10 +237,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
 //            return nil
 //        }
 
-
+        let reducedFileImage = chosenImage.resized(withPercentage: 0.5)
         let fileManager = FileManager.default
         let path = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("TestImage.png")
-        let imageData = UIImagePNGRepresentation(chosenImage)
+//        let imageData = UIImagePNGRepresentation(chosenImage)
+        let imageData = UIImagePNGRepresentation(reducedFileImage!)
         fileManager.createFile(atPath: path as String, contents: imageData, attributes: nil)
         let imageName = UUID().uuidString
         let fileUrl = NSURL(fileURLWithPath: path)
@@ -319,6 +340,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
     
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         map.camera.heading = newHeading.magneticHeading
+        self.lastHeading = newHeading.magneticHeading
         map.setCamera(map.camera, animated: true)
     }
     var firstUpdate = true
@@ -340,15 +362,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
                 map.isHidden = false
                 dropButton.isHidden = false
                 speakButton.isHidden = false
-                let mapCamera = MKMapCamera()
+                //let mapCamera = MKMapCamera()
                 //let currentSpan:MKCoordinateSpan = MKCoordinateSpanMake(0.001,0.001)
                 let myLocation:CLLocationCoordinate2D = CLLocationCoordinate2DMake(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)
                 //let myRegion:MKCoordinateRegion = MKCoordinateRegionMake(myLocation, currentSpan)
-                mapCamera.pitch = 30
-                mapCamera.altitude = 100
-//                mapCamera.heading = (currentHeading?.trueHeading)!
-                mapCamera.centerCoordinate = myLocation
-                map.camera = mapCamera
+                map.camera.pitch = 45
+                map.camera.altitude = 200
+                map.camera.heading = lastHeading
+                map.camera.centerCoordinate = myLocation
+                //map.camera = mapCamera
                 map.centerCoordinate = myLocation
                 
                 
@@ -381,6 +403,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
     }
     var globalCount = 0
     var isHeadingAvailable = false
+    var lastHeading = 0.0
     override func viewDidLoad() {
         super.viewDidLoad()
         map.delegate = self
@@ -388,7 +411,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
         speakButton.alpha = 0.2
         let mapCamera = MKMapCamera()
         mapCamera.pitch = 45
-        mapCamera.altitude = 500
+        mapCamera.altitude = 200
         mapCamera.heading = 45
         
         map.camera = mapCamera
@@ -398,7 +421,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
         map.isScrollEnabled = false
         map.mapType = .satelliteFlyover
         manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         //manager.startUpdatingHeading()
         manager.requestAlwaysAuthorization()
         manager.requestWhenInUseAuthorization()
@@ -531,10 +554,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate,UIImagePick
     }
     
     func showDrops(_ drops:NSArray){
+        let curlat = manager.location?.coordinate.latitude
+        let curlong = manager.location?.coordinate.longitude
+        let curLocation = CLLocation(latitude: curlat!, longitude: curlong!)
         for drop in drops{
             let dict = drop as! NSDictionary
             let dropPin = MyPointAnnotation()
-            dropPin.coordinate = CLLocationCoordinate2DMake(dict["lat"] as! Double, dict["lng"] as! Double)
+            let dropPinCoordinate = CLLocationCoordinate2DMake(dict["lat"] as! Double, dict["lng"] as! Double)
+            let dropPinLocation = CLLocation(latitude: dict["lat"] as! Double, longitude: dict["lng"] as! Double)
+            let pinDistance = curLocation.distance(from: dropPinLocation)
+            if(pinDistance < 25.0){
+                print(pinDistance)
+            }
+            dropPin.coordinate = dropPinCoordinate
             dropPin.title = dict["name"] as? String
             dropPin.pinTintColor = .blue
 //            dropPin.ad
